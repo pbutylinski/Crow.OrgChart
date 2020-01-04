@@ -303,3 +303,6 @@ $RECYCLE.BIN/
 
 # Bower
 bower_components
+
+Crow.OrgChart/data.json
+

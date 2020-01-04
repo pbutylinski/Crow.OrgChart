@@ -28,9 +28,10 @@ namespace Crow.OrgChart.Controllers
                 ChildLevels = childLevels
             };
 
-            return View("Level", model);
+            return View("Organization", model);
         }
 
+        [HttpGet]
         public IActionResult Level(Guid id)
         {
             // TODO: Use AutoMapper
@@ -77,7 +78,7 @@ namespace Crow.OrgChart.Controllers
         {
             if (model.Id.HasValue)
             {
-                throw new NotImplementedException();
+                this.repo.UpdateLevel(model);
             }
             else
             {
@@ -115,20 +116,6 @@ namespace Crow.OrgChart.Controllers
             return View("LevelEdit", level);
         }
 
-        [Route("level/{parentId?}/add/{name}")]
-        public IActionResult AddLevel(Guid? parentId, string name)
-        {
-            var level = new OrganizationLevel
-            {
-                ParentId = parentId,
-                Name = name
-            };
-
-            this.repo.AddLevel(level);
-
-            return Json(level.Id);
-        }
-
         [HttpGet]
         public IActionResult AddMember(Guid levelId)
         {
@@ -154,12 +141,13 @@ namespace Crow.OrgChart.Controllers
         {
             if (member.Id.HasValue)
             {
-                throw new NotImplementedException();
+                this.repo.UpdateMember(member);
             }
             else
             {
                 this.repo.AddMember(member);
             }
+
             return RedirectToAction("Level", new { id = member.LevelId });
         }
 
@@ -169,6 +157,20 @@ namespace Crow.OrgChart.Controllers
             var level = this.repo.GetLevel(levelId);
             var member = level.Members.SingleOrDefault(x => x.Id == memberId);
             return View(member);
+        }
+
+        [HttpGet] 
+        public IActionResult DeleteLevel(Guid levelId)
+        {
+            this.repo.DeleteLevel(levelId);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult DeleteMember(Guid levelId, Guid memberId)
+        {
+            this.repo.DeleteMember(levelId, memberId);
+            return RedirectToAction("Level", new { id = levelId });
         }
 
         private IEnumerable<OrganizationLevelViewModel> GetChildLevelModels(Guid? parentLevelId)

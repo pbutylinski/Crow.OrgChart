@@ -17,7 +17,11 @@ namespace Crow.OrgChart.DataStorage
             if (File.Exists(JsonFileName))
             {
                 var fileContents = File.ReadAllText(JsonFileName, Encoding.UTF8);
-                return JsonConvert.DeserializeObject<Organization>(fileContents);
+                var organization = JsonConvert.DeserializeObject<Organization>(fileContents);
+
+                this.FilterSoftDeleteFlag(organization);
+
+                return organization;
             }
 
             return new Organization();
@@ -33,13 +37,13 @@ namespace Crow.OrgChart.DataStorage
         public OrganizationLevel GetLevel(Guid id)
         {
             return this.GetOrganization().OrganizationLevels
-                .SingleOrDefault(x => x.Id == id && !x.IsDeleted);
+                .SingleOrDefault(x => x.Id == id);
         }
 
         public List<OrganizationLevel> GetChildLevels(Guid? parentId)
         {
             return this.GetOrganization().OrganizationLevels
-                .Where(x => x.ParentId == parentId && !x.IsDeleted)
+                .Where(x => x.ParentId == parentId)
                 .ToList();
         }
 
@@ -61,11 +65,12 @@ namespace Crow.OrgChart.DataStorage
             this.Save(organization);
         }
 
-        private void DeleteLevel(Guid levelId)
+        public void DeleteLevel(Guid levelId)
         {
             var organization = this.GetOrganization();
-            var level = organization.OrganizationLevels.Single(x => x.Id == levelId && !x.IsDeleted);
+            var level = organization.OrganizationLevels.Single(x => x.Id == levelId);
             level.IsDeleted = true;
+
             this.Save(organization);
         }
 
@@ -96,13 +101,42 @@ namespace Crow.OrgChart.DataStorage
             this.Save(organization);
         }
 
-        private void DeleteMember(Guid levelId, Guid memberId)
+        public void DeleteMember(Guid levelId, Guid memberId)
         {
             var organization = this.GetOrganization();
-            var level = organization.OrganizationLevels.Single(x => x.Id == levelId && !x.IsDeleted);
-            var member = level.Members.SingleOrDefault(x => x.Id == memberId && !x.IsDeleted);
+            var level = organization.OrganizationLevels.Single(x => x.Id == levelId);
+            var member = level.Members.SingleOrDefault(x => x.Id == memberId);
 
             member.IsDeleted = true;
+
+            this.Save(organization);
+        }
+
+        public void UpdateLevel(OrganizationLevel level)
+        {
+            var organization = this.GetOrganization();
+            var oldLevel = organization.OrganizationLevels
+                .Single(x => x.Id == level.Id);
+
+            oldLevel.Name = level.Name;
+
+            this.Save(organization);
+        }
+
+        public void UpdateMember(MemberDetails member)
+        {
+            var organization = this.GetOrganization();
+            var oldLevel = organization.OrganizationLevels
+                .Single(x => x.Id == member.LevelId);
+
+            var oldMember = oldLevel.Members
+                .Single(x => x.Id == member.Id);
+
+            oldMember.ContactInfo = member.ContactInfo;
+            oldMember.Hierarchy = member.Hierarchy;
+            oldMember.Name = member.Name;
+            oldMember.Notes = member.Notes;
+            oldMember.Role = member.Role;
 
             this.Save(organization);
         }
@@ -111,6 +145,19 @@ namespace Crow.OrgChart.DataStorage
         {
             var fileContents = JsonConvert.SerializeObject(organization);
             File.WriteAllText(JsonFileName, fileContents);
+        }
+
+        private void FilterSoftDeleteFlag(Organization organization)
+        {
+            organization.OrganizationLevels = organization.OrganizationLevels
+                .Where(x => !x.IsDeleted)
+                .Where(x => organization.OrganizationLevels.Any(y => x.ParentId == null || y.ParentId == x.Id))
+                .ToList();
+
+            foreach (var item in organization.OrganizationLevels)
+            {
+                item.Members = item.Members.Where(x => !x.IsDeleted).ToList();
+            }
         }
     }
 }

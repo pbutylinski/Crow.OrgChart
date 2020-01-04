@@ -1,0 +1,59 @@
+﻿@model OrganizationLevelViewModel
+@{
+    ViewData["Title"] = Model.LevelName;
+}
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <h2>@Model.LevelName</h2>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Home</a>
+        </li>
+
+        @foreach (var parent in Model.ParentLevels)
+        {
+            <li class="breadcrumb-item">
+                <a asp-controller="Organization" asp-action="Level" asp-route-id="@parent.Id">@parent.LevelName</a>
+            </li>
+        }
+
+        <li class="breadcrumb-item active" aria-current="page">@Model.LevelName</li>
+    </ol>
+</nav>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <a class="btn btn-primary" asp-controller="Organization" asp-action="EditOrganization">
+            Edit this organization
+        </a>
+
+        <a class="btn btn-outline-success" asp-controller="Organization" asp-action="CreateLevel" asp-route-parentId="@Model.Id">
+            Add new department
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                @(Model.Id.HasValue ? "Sub-departments" : "Departments")
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var level in Model.ChildLevels)
+                {
+                    <li class="list-group-item">
+                        <a asp-controller="organization" asp-action="level" asp-route-id="@level.Id">
+                            @level.LevelName
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

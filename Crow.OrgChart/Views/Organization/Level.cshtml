@@ -14,26 +14,25 @@
         <li class="breadcrumb-item">
             <a asp-controller="Home" asp-action="Index">Home</a>
         </li>
+
         @foreach (var parent in Model.ParentLevels)
         {
             <li class="breadcrumb-item">
                 <a asp-controller="Organization" asp-action="Level" asp-route-id="@parent.Id">@parent.LevelName</a>
             </li>
         }
+
         <li class="breadcrumb-item active" aria-current="page">@Model.LevelName</li>
     </ol>
 </nav>
 
 <div class="row mb-3">
     <div class="col-md-12">
-        @if (Model.Id.HasValue)
-        {
-            <div class="btn-group">
-                <a class="btn btn-success" asp-controller="Organization" asp-action="AddMember" asp-route-levelId="@Model.Id">
-                    Add member
-                </a>
-            </div>
-        }
+        <div class="btn-group">
+            <a class="btn btn-success" asp-controller="Organization" asp-action="AddMember" asp-route-levelId="@Model.Id">
+                Add member
+            </a>
+        </div>
 
         <div class="btn-group">
             @if (Model.Id.HasValue)
@@ -43,39 +42,60 @@
                 </a>
             }
 
-        <a class="btn btn-outline-success" asp-controller="Organization" asp-action="CreateLevel" asp-route-parentId="@Model.Id">
-            Add new @(Model.Id.HasValue ? "sub-department" : "department")
-        </a>
+            <a class="btn btn-outline-success" asp-controller="Organization" asp-action="CreateLevel" asp-route-parentId="@Model.Id">
+                Add new sub-department
+            </a>
+        </div>
+
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete-confirm">
+            Delete
+        </button>
+
+        <div class="modal fade" id="delete-confirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Delete Confirmation</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure want to delete <kbd>@Model.LevelName</kbd>? <strong> This will remove all members and sub-departments! </strong>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-danger" asp-controller="Organization" asp-action="DeleteLevel" asp-route-levelId="@Model.Id">
+                            Delete
+                        </a>
+                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="row">
-    @if (Model.Id.HasValue)
-    {
-        <div class="col-md-7">
-            <div class="card">
-                <div class="card-header">
-                    Members
-                </div>
-                <ul class="list-group list-group-flush">
-                    @foreach (var member in Model.Members)
-                    {
-                        <li class="list-group-item">
-                            <a asp-controller="organization" asp-action="member" asp-route-memberId="@member.Id" asp-route-levelId="@member.LevelId">
-                                @member.Name <span class="badge badge-secondary">@member.Role</span>
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        </div>
-    }
-
-    <div class="@(Model.Id.HasValue ? "col-md-5" : "col-md-12")">
+    <div class="col-md-7">
         <div class="card">
             <div class="card-header">
-                @(Model.Id.HasValue ? "Sub-departments" : "Departments")
+                Members
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var member in Model.Members)
+                {
+                    <li class="list-group-item">
+                        <a asp-controller="organization" asp-action="member" asp-route-memberId="@member.Id" asp-route-levelId="@member.LevelId">
+                            @member.Name <span class="badge badge-secondary">@member.Role</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">
+                Sub-departments
             </div>
             <ul class="list-group list-group-flush">
                 @foreach (var level in Model.ChildLevels)

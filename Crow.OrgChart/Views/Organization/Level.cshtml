@@ -1,0 +1,62 @@
+﻿@model OrganizationLevelViewModel
+@{
+    ViewData["Title"] = Model.LevelName;
+}
+
+<h2>@Model.LevelName</h2>
+<hr />
+
+<div class="row">
+    @if (!Model.IsTopLevel)
+    {
+        <div class="col-md-7">
+            <fieldset>
+                <legend>Members</legend>
+
+                <table class="table table-hover w-100">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var member in Model.Members)
+                        {
+                            <tr>
+                                <td>@member.Name</td>
+                                <td>@member.Role</td>
+                                <td>@member.Id</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
+    }
+
+    <div class="col-md-5">
+        <fieldset>
+            @if (Model.IsTopLevel)
+            {
+                <legend>Departments</legend>
+            }
+            else
+            {
+                <legend>Sub-departments</legend>
+            }
+
+            <ul>
+                @foreach (var level in Model.ChildLevels)
+                {
+                    <li>
+                        <a asp-controller="organization" asp-action="level" asp-route-id="@level.Id">
+                            @level.LevelName
+                        </a>
+                    </li>
+                }
+            </ul>
+        </fieldset>
+    </div>
+</div>

@@ -13,10 +13,21 @@
     <script src="~/Scripts/index.js"></script>
 }
 
-<h1>@Model.OrganizationName</h1>
+<h1>
+    @Model.OrganizationName
+    <small style="font-size: 13px;">
+        <a asp-controller="Organization" asp-action="EditOrganization">[ Edit ]</a>
+    </small>
+</h1>
+
 <h2>Departments chart</h2>
-<hr />
 
 <div class="row">
-    <div id="orgChart"></div>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body overflow-auto">
+                <div id="orgChart"></div>
+            </div>
+        </div>
+    </div>
 </div>

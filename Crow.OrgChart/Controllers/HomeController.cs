@@ -1,6 +1,7 @@
 ﻿using Crow.OrgChart.DataStorage;
 using Crow.OrgChart.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Diagnostics;
 using System.Linq;
 
@@ -36,9 +37,16 @@ namespace Crow.OrgChart.Controllers
             var organization = this.repo.GetOrganization();
             var items = organization.OrganizationLevels.Select(x => new
             {
-                id = x.Id,
-                parent = x.ParentId.ToString() ?? "0",
+                id = x.Id.Value,
+                parent = (x.ParentId ?? Guid.Empty).ToString(),
                 name = x.Name
+            }).ToList();
+
+            items.Add(new
+            {
+                id = Guid.Empty,
+                parent = string.Empty,
+                name = organization.Name
             });
 
             return Json(items.ToList());

@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace Crow.OrgChart.Controllers
 {
-    [Route("organization")]
     public class OrganizationController : Controller
     {
         private readonly IOrganizationStorageRepository repo;
@@ -18,7 +17,6 @@ namespace Crow.OrgChart.Controllers
             this.repo = repo;
         }
 
-        [Route("")]
         public IActionResult Index()
         {
             var organization = this.repo.GetOrganization();
@@ -33,13 +31,12 @@ namespace Crow.OrgChart.Controllers
             return View("Level", model);
         }
 
-        [Route("level/{id}")]
         public IActionResult Level(Guid id)
         {
             // TODO: Use AutoMapper
-            OrganizationLevelViewModel parentLevel = null;
-
+            var parentLevels = new List<OrganizationLevelViewModel>();
             var level = this.repo.GetLevel(id);
+            var currentParentId = level.ParentId;
             var childLevels = this.GetChildLevelModels(id);
             var members = level.Members.Select(x => new MemberListItemViewModel
             {
@@ -49,15 +46,18 @@ namespace Crow.OrgChart.Controllers
                 Role = x.Role
             });
 
-            if (level.ParentId.HasValue)
+            while (currentParentId.HasValue)
             {
-                var parent = this.repo.GetLevel(level.ParentId.Value);
-                parentLevel = new OrganizationLevelViewModel
+                var parent = this.repo.GetLevel(currentParentId.Value);
+                currentParentId = parent.ParentId;
+                parentLevels.Add(new OrganizationLevelViewModel
                 {
                     Id = parent.Id,
                     LevelName = parent.Name
-                };
+                });
             }
+
+            parentLevels.Reverse();
 
             var model = new OrganizationLevelViewModel
             {
@@ -65,10 +65,53 @@ namespace Crow.OrgChart.Controllers
                 LevelName = level.Name,
                 ChildLevels = childLevels,
                 Members = members.OrderBy(x => x.Hierarchy).ThenBy(x => x.Name),
-                ParentLevel = parentLevel
+                ParentLevels = parentLevels
             };
 
             return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult SaveLevel(OrganizationLevel model)
+        {
+            if (model.Id.HasValue)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                this.repo.AddLevel(model);
+            }
+
+            return RedirectToAction("Level", new { id = model.Id });
+        }
+
+        [HttpGet]
+        public IActionResult EditOrganization()
+        {
+            var model = this.repo.GetOrganization();
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditOrganization(Organization model)
+        {
+            this.repo.SetOrganizationName(model.Name);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult EditLevel(Guid id)
+        {
+            var level = this.repo.GetLevel(id);
+            return View("LevelEdit", level);
+        }
+
+        [HttpGet]
+        public IActionResult CreateLevel(Guid? parentId)
+        {
+            var level = new OrganizationLevel { ParentId = parentId };
+            return View("LevelEdit", level);
         }
 
         [Route("level/{parentId?}/add/{name}")]

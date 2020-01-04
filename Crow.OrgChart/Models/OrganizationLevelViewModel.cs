@@ -13,6 +13,6 @@ namespace Crow.OrgChart.Models
 
         public IEnumerable<OrganizationLevelViewModel> ChildLevels { get; set; } = new List<OrganizationLevelViewModel>();
 
-        public OrganizationLevelViewModel ParentLevel { get; set; }
+        public IEnumerable<OrganizationLevelViewModel> ParentLevels { get; set; } = new List<OrganizationLevelViewModel>();
     }
 }

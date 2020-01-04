@@ -4,7 +4,12 @@
         showControls: false,
         allowEdit: false,
         onClickNode: function (node) {
-            window.location.href = 'Organization/Level/' + node.data.id;
+            if (node.data.id === '00000000-0000-0000-0000-000000000000') {
+                window.location.href = 'Organization';
+            }
+            else {
+                window.location.href = 'Organization/Level/' + node.data.id;
+            }
         }
     });
 }

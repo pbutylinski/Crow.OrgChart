@@ -3,67 +3,87 @@
     ViewData["Title"] = Model.LevelName;
 }
 
-<h2>@Model.LevelName</h2>
-<hr />
+<div class="row mb-3">
+    <div class="col-md-12">
+        <h2>@Model.LevelName</h2>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Home</a>
+        </li>
+        @foreach (var parent in Model.ParentLevels)
+        {
+            <li class="breadcrumb-item">
+                <a asp-controller="Organization" asp-action="Level" asp-route-id="@parent.Id">@parent.LevelName</a>
+            </li>
+        }
+        <li class="breadcrumb-item active" aria-current="page">@Model.LevelName</li>
+    </ol>
+</nav>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        @if (Model.Id.HasValue)
+        {
+            <a class="btn btn-primary" asp-controller="Organization" asp-action="EditLevel" asp-route-id="@Model.Id">
+                Edit this department
+            </a>
+        }
+
+        <a class="btn btn-outline-success" asp-controller="Organization" asp-action="CreateLevel" asp-route-parentId="@Model.Id">
+            Add new sub-department
+        </a>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-md-7">
-        <fieldset>
-            <legend>Members</legend>
-
-            <table class="table table-hover w-100">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var member in Model.Members)
-                    {
+        <div class="card">
+            <div class="card-header">
+                Members
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover w-100">
+                    <thead>
                         <tr>
-                            <td>@member.Name</td>
-                            <td>@member.Role</td>
-                            <td>@member.Id</td>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Actions</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </fieldset>
+                    </thead>
+                    <tbody>
+                        @foreach (var member in Model.Members)
+                        {
+                            <tr>
+                                <td>@member.Name</td>
+                                <td>@member.Role</td>
+                                <td>@member.Id</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <div class="col-md-5">
-        <fieldset>
-            <legend>Sub-departments</legend>
-
-            <ul>
+        <div class="card">
+            <div class="card-header">
+                Sub-departments
+            </div>
+            <ul class="list-group list-group-flush">
                 @foreach (var level in Model.ChildLevels)
                 {
-                    <li>
+                    <li class="list-group-item">
                         <a asp-controller="organization" asp-action="level" asp-route-id="@level.Id">
                             @level.LevelName
                         </a>
                     </li>
                 }
             </ul>
-        </fieldset>
+        </div>
     </div>
 </div>
-
-<hr />
-
-@if (Model.ParentLevel == null)
-{
-    <a class="btn btn-block btn-outline-primary" asp-controller="home" asp-action="index">
-        <i class="fa fa-back"></i>
-        Go back to organization diagram
-    </a>
-}
-else
-{
-    <a class="btn btn-block btn-outline-primary" asp-controller="organization" asp-action="level" asp-route-id="@Model.ParentLevel.Id">
-        <i class="fa fa-back"></i>
-        Go back to @Model.ParentLevel.LevelName
-    </a>
-}

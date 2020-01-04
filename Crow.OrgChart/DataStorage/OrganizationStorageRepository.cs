@@ -69,7 +69,7 @@ namespace Crow.OrgChart.DataStorage
             this.Save(organization);
         }
 
-        public void AddMember(MemberDetails member, Guid levelId)
+        public void AddMember(MemberDetails member)
         {
             if (member.Id.HasValue)
             {
@@ -87,7 +87,8 @@ namespace Crow.OrgChart.DataStorage
             }
 
             var organization = this.GetOrganization();
-            var level = organization.OrganizationLevels.Single(x => x.Id == levelId && !x.IsDeleted);
+            var level = organization.OrganizationLevels
+                .Single(x => x.Id == member.LevelId && !x.IsDeleted);
 
             member.Id = Guid.NewGuid();
             level.Members.Add(member);

@@ -1,0 +1,85 @@
+﻿@model Crow.OrgChart.DataStorage.MemberDetails
+@inject Crow.OrgChart.DataStorage.IOrganizationStorageRepository repo
+
+@{
+    ViewData["Title"] = Model.Name;
+    var department = repo.GetLevel(Model.LevelId);
+}
+
+@section Styles {
+    <style type="text/css">
+        strong.col-sm-2 {
+            padding-left: 0;
+            display: inline-block;
+        }
+    </style>
+}
+
+<h1 class="mb-3">@Model.Name</h1>
+
+<hr />
+
+<div class="btn-group mb-3">
+    <a class="btn btn-success"
+       asp-controller="Organization"
+       asp-action="EditMember"
+       asp-route-levelId="@Model.LevelId"
+       asp-route-memberId="@Model.Id">
+        Edit details
+    </a>
+</div>
+
+<div class="card mb-3">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <strong class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Role)
+            </strong>
+            <span class="col-sm-10">
+                <span class="badge badge-secondary">
+                    @Html.DisplayFor(model => model.Role)
+                </span>
+            </span>
+        </li>
+        <li class="list-group-item">
+
+            <strong class="col-sm-2">
+                Department
+            </strong>
+            <span class="col-sm-10">
+                @department.Name
+            </span>
+        </li>
+        <li class="list-group-item">
+            <strong class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ContactInfo)
+            </strong>
+            <span class="col-sm-10">
+                @Html.DisplayFor(model => model.ContactInfo)
+            </span>
+        </li>
+        <li class="list-group-item">
+            <strong class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Hierarchy)
+            </strong>
+            <span class="col-sm-10">
+                @Html.DisplayFor(model => model.Hierarchy)
+            </span>
+        </li>
+        <li class="list-group-item">
+            <strong class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Notes)
+            </strong>
+            <span class="col-sm-10">
+                @Html.DisplayFor(model => model.Notes)
+            </span>
+        </li>
+    </ul>
+</div>
+
+<a class="btn btn-outline-primary btn-block" 
+   asp-controller="Organization"
+   asp-action="Level" 
+   asp-route-id="@department.Id">
+    Go back to @department.Name
+</a>

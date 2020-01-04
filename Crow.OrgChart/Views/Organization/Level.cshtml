@@ -28,51 +28,54 @@
     <div class="col-md-12">
         @if (Model.Id.HasValue)
         {
-            <a class="btn btn-primary" asp-controller="Organization" asp-action="EditLevel" asp-route-id="@Model.Id">
-                Edit this department
-            </a>
+            <div class="btn-group">
+                <a class="btn btn-success" asp-controller="Organization" asp-action="AddMember" asp-route-levelId="@Model.Id">
+                    Add member
+                </a>
+            </div>
         }
 
+        <div class="btn-group">
+            @if (Model.Id.HasValue)
+            {
+                <a class="btn btn-primary" asp-controller="Organization" asp-action="EditLevel" asp-route-id="@Model.Id">
+                    Edit this department
+                </a>
+            }
+
         <a class="btn btn-outline-success" asp-controller="Organization" asp-action="CreateLevel" asp-route-parentId="@Model.Id">
-            Add new sub-department
+            Add new @(Model.Id.HasValue ? "sub-department" : "department")
         </a>
+        </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-7">
-        <div class="card">
-            <div class="card-header">
-                Members
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-hover w-100">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var member in Model.Members)
-                        {
-                            <tr>
-                                <td>@member.Name</td>
-                                <td>@member.Role</td>
-                                <td>@member.Id</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    @if (Model.Id.HasValue)
+    {
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    Members
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var member in Model.Members)
+                    {
+                        <li class="list-group-item">
+                            <a asp-controller="organization" asp-action="member" asp-route-memberId="@member.Id" asp-route-levelId="@member.LevelId">
+                                @member.Name <span class="badge badge-secondary">@member.Role</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
             </div>
         </div>
-    </div>
+    }
 
-    <div class="col-md-5">
+    <div class="@(Model.Id.HasValue ? "col-md-5" : "col-md-12")">
         <div class="card">
             <div class="card-header">
-                Sub-departments
+                @(Model.Id.HasValue ? "Sub-departments" : "Departments")
             </div>
             <ul class="list-group list-group-flush">
                 @foreach (var level in Model.ChildLevels)

@@ -43,7 +43,8 @@ namespace Crow.OrgChart.Controllers
                 Id = x.Id.Value,
                 Hierarchy = x.Hierarchy,
                 Name = x.Name,
-                Role = x.Role
+                Role = x.Role,
+                LevelId = x.LevelId
             });
 
             while (currentParentId.HasValue)
@@ -128,17 +129,46 @@ namespace Crow.OrgChart.Controllers
             return Json(level.Id);
         }
 
-        [Route("level/{levelId}/members/add/{name}")]
-        public IActionResult AddMember(Guid levelId, string name)
+        [HttpGet]
+        public IActionResult AddMember(Guid levelId)
         {
             var member = new MemberDetails
             {
-                Name = name
+                LevelId = levelId
             };
 
-            this.repo.AddMember(member, levelId);
+            return View("MemberEdit", member);
+        }
 
-            return Json(member.Id);
+        [HttpGet]
+        public IActionResult EditMember(Guid levelId, Guid memberId)
+        {
+            var level = this.repo.GetLevel(levelId);
+            var member = level.Members.SingleOrDefault(x => x.Id == memberId);
+
+            return View("MemberEdit", member);
+        }
+
+        [HttpPost]
+        public IActionResult SaveMember(MemberDetails member)
+        {
+            if (member.Id.HasValue)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                this.repo.AddMember(member);
+            }
+            return RedirectToAction("Level", new { id = member.LevelId });
+        }
+
+        [HttpGet]
+        public IActionResult Member(Guid levelId, Guid memberId)
+        {
+            var level = this.repo.GetLevel(levelId);
+            var member = level.Members.SingleOrDefault(x => x.Id == memberId);
+            return View(member);
         }
 
         private IEnumerable<OrganizationLevelViewModel> GetChildLevelModels(Guid? parentLevelId)
@@ -164,7 +194,8 @@ namespace Crow.OrgChart.Controllers
                                         Id = m.Id.Value,
                                         Hierarchy = m.Hierarchy,
                                         Name = m.Name,
-                                        Role = m.Role
+                                        Role = m.Role,
+                                        LevelId = m.LevelId
                                     })
                             });
         }

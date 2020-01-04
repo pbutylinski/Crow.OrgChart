@@ -1,9 +1,5 @@
 ﻿@model Crow.OrgChart.DataStorage.Models.OrganizationLevel
 
-@{
-    ViewData["Title"] = "View";
-}
-
 @if (Model.Id.HasValue)
 {
     <h1>Edit</h1>
@@ -30,10 +26,6 @@ else
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

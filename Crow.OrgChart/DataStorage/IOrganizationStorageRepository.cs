@@ -7,7 +7,7 @@ namespace Crow.OrgChart.DataStorage
     public interface IOrganizationStorageRepository
     {
         void AddLevel(OrganizationLevel level);
-        void AddMember(MemberDetails member, Guid levelId);
+        void AddMember(MemberDetails member);
         List<OrganizationLevel> GetChildLevels(Guid? parentId);
         OrganizationLevel GetLevel(Guid id);
         Organization GetOrganization();

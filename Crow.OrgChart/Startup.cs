@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Crow.OrgChart.DataStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace Crow.OrgChart
 {
@@ -32,7 +27,7 @@ namespace Crow.OrgChart
 
             services.AddMvcCore(options =>
             {
-                options.Filters.Add(new BasicAuthenticationAttribute("org", "your-password"));
+                options.Filters.Add(new BasicAuthenticationAttribute(Configuration));
             });
         }
 

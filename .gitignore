@@ -305,4 +305,4 @@ $RECYCLE.BIN/
 bower_components
 
 Crow.OrgChart/data.json
-
+Crow.OrgChart/appsettings.Release.json

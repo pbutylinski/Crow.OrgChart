@@ -29,6 +29,11 @@ namespace Crow.OrgChart
         {
             services.AddControllersWithViews();
             services.AddTransient<IOrganizationStorageRepository, OrganizationStorageRepository>();
+
+            services.AddMvcCore(options =>
+            {
+                options.Filters.Add(new BasicAuthenticationAttribute("org", "your-password"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

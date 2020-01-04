@@ -1,7 +1,22 @@
-﻿@model OrganizationLevelViewModel
+﻿@model IndexViewModel
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = $"Home Page - {Model.OrganizationName}";
 }
 
-<partial name="OrganizationLevel" model="Model" />
+@section Styles {
+    <link href="~/Styles/jquery.orgchart.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    <script src="~/Scripts/jquery.orgchart.js"></script>
+    <script src="~/Scripts/index.js"></script>
+}
+
+<h1>@Model.OrganizationName</h1>
+<h2>Departments chart</h2>
+<hr />
+
+<div class="row">
+    <div id="orgChart"></div>
+</div>

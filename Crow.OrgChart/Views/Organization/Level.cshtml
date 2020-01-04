@@ -7,45 +7,35 @@
 <hr />
 
 <div class="row">
-    @if (!Model.IsTopLevel)
-    {
-        <div class="col-md-7">
-            <fieldset>
-                <legend>Members</legend>
+    <div class="col-md-7">
+        <fieldset>
+            <legend>Members</legend>
 
-                <table class="table table-hover w-100">
-                    <thead>
+            <table class="table table-hover w-100">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var member in Model.Members)
+                    {
                         <tr>
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th>Actions</th>
+                            <td>@member.Name</td>
+                            <td>@member.Role</td>
+                            <td>@member.Id</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var member in Model.Members)
-                        {
-                            <tr>
-                                <td>@member.Name</td>
-                                <td>@member.Role</td>
-                                <td>@member.Id</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </fieldset>
-        </div>
-    }
+                    }
+                </tbody>
+            </table>
+        </fieldset>
+    </div>
 
     <div class="col-md-5">
         <fieldset>
-            @if (Model.IsTopLevel)
-            {
-                <legend>Departments</legend>
-            }
-            else
-            {
-                <legend>Sub-departments</legend>
-            }
+            <legend>Sub-departments</legend>
 
             <ul>
                 @foreach (var level in Model.ChildLevels)
@@ -60,3 +50,20 @@
         </fieldset>
     </div>
 </div>
+
+<hr />
+
+@if (Model.ParentLevel == null)
+{
+    <a class="btn btn-block btn-outline-primary" asp-controller="home" asp-action="index">
+        <i class="fa fa-back"></i>
+        Go back to organization diagram
+    </a>
+}
+else
+{
+    <a class="btn btn-block btn-outline-primary" asp-controller="organization" asp-action="level" asp-route-id="@Model.ParentLevel.Id">
+        <i class="fa fa-back"></i>
+        Go back to @Model.ParentLevel.LevelName
+    </a>
+}

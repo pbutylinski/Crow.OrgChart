@@ -9,10 +9,10 @@ namespace Crow.OrgChart.Models
 
         public string LevelName { get; set; }
 
-        public bool IsTopLevel { get; set; }
-
         public IEnumerable<MemberListItemViewModel> Members { get; set; } = new List<MemberListItemViewModel>();
 
         public IEnumerable<OrganizationLevelViewModel> ChildLevels { get; set; } = new List<OrganizationLevelViewModel>();
+
+        public OrganizationLevelViewModel ParentLevel { get; set; }
     }
 }

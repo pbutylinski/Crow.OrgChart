@@ -1,4 +1,5 @@
 ﻿using Crow.OrgChart.DataStorage;
+using Crow.OrgChart.Helpers;
 using Crow.OrgChart.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -16,6 +17,7 @@ namespace Crow.OrgChart.Controllers
             this.repo = repo;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             var organization = this.repo.GetOrganization();
@@ -23,6 +25,42 @@ namespace Crow.OrgChart.Controllers
             {
                 OrganizationName = organization.Name
             };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Search(string phrase)
+        {
+            var organization = this.repo.GetOrganization();
+            var phraseClean = (phrase ?? "").Trim().ToLower();
+
+            var levels = organization.OrganizationLevels
+                .Where(x => x.Name.ToLower().Contains(phraseClean))
+                .Select(x => new OrganizationLevelViewModel
+                {
+                    Id = x.Id,
+                    LevelName = x.Name,
+                    ParentLevels = LevelHelper.GetParentLevels(organization, x)
+                });
+
+            var users = organization.OrganizationLevels
+                .SelectMany(x => x.Members)
+                .Where(x => x.Name.ToLower().Contains(phraseClean))
+                .Select(x => new MemberListItemViewModel
+                {
+                    Id = x.Id.Value,
+                    LevelId = x.LevelId,
+                    Role = x.Role,
+                    Name = x.Name
+                });
+
+            var model = new SearchResultViewModel
+            {
+                Phrase = phrase,
+                Levels = levels.OrderBy(x => x.LevelName),
+                Members = users.OrderBy(x => x.Name)
+            };
+
             return View(model);
         }
 

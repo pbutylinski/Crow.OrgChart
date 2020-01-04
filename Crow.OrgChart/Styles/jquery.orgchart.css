@@ -64,9 +64,9 @@ div.orgChart {
         cursor: pointer;
         border: 1px solid #e7e7e7;
         display: inline-block;
-        padding: 5px;
-        width: 96px;
-        height: 60px;
+        padding: 8px;
+        min-width: 170px;
+        height: 40px;
         background: #ffffff; /* Old browsers */
         background: -moz-linear-gradient(top, #ffffff 0%, #fbfbfb 100%); /* FF3.6+ */
         background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(100%, #fbfbfb)); /* Chrome,Safari4+ */

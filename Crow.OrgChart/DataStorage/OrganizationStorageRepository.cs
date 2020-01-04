@@ -72,6 +72,11 @@ namespace Crow.OrgChart.DataStorage
             level.IsDeleted = true;
 
             this.Save(organization);
+
+            foreach (var item in organization.OrganizationLevels.Where(x => x.ParentId == levelId))
+            {
+                this.DeleteLevel(item.Id.Value);
+            }
         }
 
         public void AddMember(MemberDetails member)
@@ -151,7 +156,6 @@ namespace Crow.OrgChart.DataStorage
         {
             organization.OrganizationLevels = organization.OrganizationLevels
                 .Where(x => !x.IsDeleted)
-                .Where(x => organization.OrganizationLevels.Any(y => x.ParentId == null || y.ParentId == x.Id))
                 .ToList();
 
             foreach (var item in organization.OrganizationLevels)

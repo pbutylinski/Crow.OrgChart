@@ -1,0 +1,83 @@
+﻿@model SearchResultViewModel
+@inject Crow.OrgChart.DataStorage.IOrganizationStorageRepository repo
+@using Crow.OrgChart.Helpers
+
+@{
+    ViewData["Title"] = "Search";
+
+    var organization = repo.GetOrganization();
+}
+
+<div class="mb-3">
+    @if (string.IsNullOrWhiteSpace(Model.Phrase))
+    {
+        <h1>Search results</h1>
+    }
+    else
+    {
+        <h1>Search results for <kbd>@Model.Phrase</kbd></h1>
+    }
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Members
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var member in Model.Members)
+                {
+                    <li class="list-group-item">
+                        <a asp-controller="organization" asp-action="member" asp-route-memberId="@member.Id" asp-route-levelId="@member.LevelId">
+                            @member.Name <span class="badge badge-secondary">@member.Role</span>
+                        </a>
+
+                        <br />
+                        <small class="text-muted">
+                            @organization.Name <span>></span>
+
+                            @foreach (var level in LevelHelper.GetParentLevels(organization, repo.GetLevel(member.LevelId.Value)))
+                            {
+                                @level.LevelName
+                                <span>></span>
+                            }
+
+                            @repo.GetLevel(member.LevelId.Value).Name
+                        </small>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Departments
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var level in Model.Levels)
+                {
+                    <li class="list-group-item">
+                        <a asp-controller="Organization" asp-action="Level" asp-route-id="@level.Id">
+                            @level.LevelName
+                        </a>
+
+                        <br />
+
+                        <small class="text-muted">
+                            @organization.Name
+
+                            @if (level.ParentLevels.Any())
+                            {
+                                <span>></span>
+                                @String.Join(" > ", level.ParentLevels.Select(x => x.LevelName))
+                            }
+                        </small>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

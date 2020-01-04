@@ -1,5 +1,6 @@
 ﻿using Crow.OrgChart.DataStorage;
 using Crow.OrgChart.DataStorage.Models;
+using Crow.OrgChart.Helpers;
 using Crow.OrgChart.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -35,9 +36,8 @@ namespace Crow.OrgChart.Controllers
         public IActionResult Level(Guid id)
         {
             // TODO: Use AutoMapper
-            var parentLevels = new List<OrganizationLevelViewModel>();
             var level = this.repo.GetLevel(id);
-            var currentParentId = level.ParentId;
+            var organization = this.repo.GetOrganization();
             var childLevels = this.GetChildLevelModels(id);
             var members = level.Members.Select(x => new MemberListItemViewModel
             {
@@ -48,26 +48,13 @@ namespace Crow.OrgChart.Controllers
                 LevelId = x.LevelId
             });
 
-            while (currentParentId.HasValue)
-            {
-                var parent = this.repo.GetLevel(currentParentId.Value);
-                currentParentId = parent.ParentId;
-                parentLevels.Add(new OrganizationLevelViewModel
-                {
-                    Id = parent.Id,
-                    LevelName = parent.Name
-                });
-            }
-
-            parentLevels.Reverse();
-
             var model = new OrganizationLevelViewModel
             {
                 Id = id,
                 LevelName = level.Name,
                 ChildLevels = childLevels,
                 Members = members.OrderBy(x => x.Hierarchy).ThenBy(x => x.Name),
-                ParentLevels = parentLevels
+                ParentLevels = LevelHelper.GetParentLevels(organization, level)
             };
 
             return View(model);

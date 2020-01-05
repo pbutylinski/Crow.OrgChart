@@ -1,10 +1,8 @@
 ﻿using Crow.OrgChart.DataStorage;
 using Crow.OrgChart.DataStorage.Models;
-using Crow.OrgChart.Helpers;
-using Crow.OrgChart.Models;
+using Crow.OrgChart.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Crow.OrgChart.Controllers
@@ -12,51 +10,26 @@ namespace Crow.OrgChart.Controllers
     public class OrganizationController : Controller
     {
         private readonly IOrganizationStorageRepository repo;
+        private readonly IOrganizationViewModelService viewModelService;
 
-        public OrganizationController(IOrganizationStorageRepository repo)
+        public OrganizationController(
+            IOrganizationStorageRepository repo,
+            IOrganizationViewModelService viewModelService)
         {
             this.repo = repo;
+            this.viewModelService = viewModelService;
         }
 
         public IActionResult Index()
         {
-            var organization = this.repo.GetOrganization();
-            var childLevels = this.GetChildLevelModels(null);
-
-            var model = new OrganizationLevelViewModel
-            {
-                LevelName = organization.Name,
-                ChildLevels = childLevels
-            };
-
+            var model = this.viewModelService.GetOrganizationViewModel();
             return View("Organization", model);
         }
 
         [HttpGet]
         public IActionResult Level(Guid id)
         {
-            // TODO: Use AutoMapper
-            var level = this.repo.GetLevel(id);
-            var organization = this.repo.GetOrganization();
-            var childLevels = this.GetChildLevelModels(id);
-            var members = level.Members.Select(x => new MemberListItemViewModel
-            {
-                Id = x.Id.Value,
-                Hierarchy = x.Hierarchy,
-                Name = x.Name,
-                Role = x.Role,
-                LevelId = x.LevelId
-            });
-
-            var model = new OrganizationLevelViewModel
-            {
-                Id = id,
-                LevelName = level.Name,
-                ChildLevels = childLevels,
-                Members = members.OrderBy(x => x.Hierarchy).ThenBy(x => x.Name),
-                ParentLevels = LevelHelper.GetParentLevels(organization, level)
-            };
-
+            var model = this.viewModelService.GetLevelViewModel(id);
             return View(model);
         }
 
@@ -158,35 +131,6 @@ namespace Crow.OrgChart.Controllers
         {
             this.repo.DeleteMember(levelId, memberId);
             return RedirectToAction("Level", new { id = levelId });
-        }
-
-        private IEnumerable<OrganizationLevelViewModel> GetChildLevelModels(Guid? parentLevelId)
-        {
-            return this.repo.GetChildLevels(parentLevelId)
-                            .OrderBy(x => x.Name)
-                            .Select(x => new OrganizationLevelViewModel
-                            {
-                                Id = x.Id.Value,
-                                LevelName = x.Name,
-                                ChildLevels = this.repo
-                                    .GetChildLevels(x.Id)
-                                    .OrderBy(x => x.Name)
-                                    .Select(c => new OrganizationLevelViewModel
-                                    {
-                                        Id = c.Id.Value,
-                                        LevelName = c.Name
-                                    }),
-                                Members = x.Members
-                                    .OrderBy(x => x.Hierarchy)
-                                    .Select(m => new MemberListItemViewModel
-                                    {
-                                        Id = m.Id.Value,
-                                        Hierarchy = m.Hierarchy,
-                                        Name = m.Name,
-                                        Role = m.Role,
-                                        LevelId = m.LevelId
-                                    })
-                            });
         }
     }
 }

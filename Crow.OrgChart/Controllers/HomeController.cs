@@ -1,8 +1,7 @@
 ﻿using Crow.OrgChart.DataStorage;
-using Crow.OrgChart.Helpers;
 using Crow.OrgChart.Models;
+using Crow.OrgChart.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Diagnostics;
 using System.Linq;
 
@@ -11,48 +10,32 @@ namespace Crow.OrgChart.Controllers
     public class HomeController : Controller
     {
         private readonly IOrganizationStorageRepository repo;
+        private readonly IOrganizationViewModelService viewModelService;
+        private readonly ISearchService searchService;
 
-        public HomeController(IOrganizationStorageRepository repo)
+        public HomeController(
+            IOrganizationStorageRepository repo,
+            IOrganizationViewModelService viewModelService,
+            ISearchService searchService)
         {
             this.repo = repo;
+            this.viewModelService = viewModelService;
+            this.searchService = searchService;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
             var organization = this.repo.GetOrganization();
-            var model = new IndexViewModel
-            {
-                OrganizationName = organization.Name
-            };
+            var model = new IndexViewModel { OrganizationName = organization.Name };
             return View(model);
         }
 
         [HttpPost]
         public IActionResult Search(string phrase)
         {
-            var organization = this.repo.GetOrganization();
-            var phraseClean = (phrase ?? "").Trim().ToLower();
-
-            var levels = organization.OrganizationLevels
-                .Where(x => x.Name.ToLower().Contains(phraseClean))
-                .Select(x => new OrganizationLevelViewModel
-                {
-                    Id = x.Id,
-                    LevelName = x.Name,
-                    ParentLevels = LevelHelper.GetParentLevels(organization, x)
-                });
-
-            var users = organization.OrganizationLevels
-                .SelectMany(x => x.Members)
-                .Where(x => x.Name.ToLower().Contains(phraseClean))
-                .Select(x => new MemberListItemViewModel
-                {
-                    Id = x.Id.Value,
-                    LevelId = x.LevelId,
-                    Role = x.Role,
-                    Name = x.Name
-                });
+            var levels = this.searchService.SearchLevels(phrase);
+            var users = this.searchService.SearchUsers(phrase);
 
             var model = new SearchResultViewModel
             {
@@ -72,21 +55,7 @@ namespace Crow.OrgChart.Controllers
 
         public IActionResult ChartData()
         {
-            var organization = this.repo.GetOrganization();
-            var items = organization.OrganizationLevels.Select(x => new
-            {
-                id = x.Id.Value,
-                parent = (x.ParentId ?? Guid.Empty).ToString(),
-                name = x.Name
-            }).ToList();
-
-            items.Add(new
-            {
-                id = Guid.Empty,
-                parent = string.Empty,
-                name = organization.Name
-            });
-
+            var items = this.viewModelService.GetChartViewModelItems();
             return Json(items.ToList());
         }
     }

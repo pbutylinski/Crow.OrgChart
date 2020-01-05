@@ -1,4 +1,5 @@
 using Crow.OrgChart.DataStorage;
+using Crow.OrgChart.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +25,8 @@ namespace Crow.OrgChart
         {
             services.AddControllersWithViews();
             services.AddTransient<IOrganizationStorageRepository, OrganizationStorageRepository>();
+            services.AddTransient<ISearchService, SearchService>();
+            services.AddTransient<IOrganizationViewModelService, OrganizationViewModelService>();
 
             services.AddMvcCore(options =>
             {

@@ -160,8 +160,7 @@ namespace Crow.OrgChart.DataStorage
         {
             var fileContents = JsonConvert.SerializeObject(organization);
             File.WriteAllText(JsonFileName, fileContents);
-
-            OrganizationCache = organization;
+            this.LoadFile();
         }
 
         private void FilterSoftDeleteFlag(Organization organization)

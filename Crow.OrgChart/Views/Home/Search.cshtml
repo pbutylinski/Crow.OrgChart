@@ -30,7 +30,16 @@
                 {
                     <li class="list-group-item">
                         <a asp-controller="organization" asp-action="member" asp-route-memberId="@member.Id" asp-route-levelId="@member.LevelId">
-                            @member.Name <span class="badge badge-secondary">@member.Role</span>
+                            @member.Name
+                            
+                            @if (member.IsManager)
+                            {
+                                <span class="badge badge-pill badge-danger">Manager &bull; @member.Role</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-pill badge-secondary">@member.Role</span>
+                            }
                         </a>
 
                         <br />

@@ -15,7 +15,14 @@
     </style>
 }
 
-<h1 class="mb-3">@Model.Name</h1>
+<h1 class="mb-3">
+    @Model.Name
+
+    @if (Model.IsManager)
+    {
+        <span class="badge badge-danger badge-pill">Department Manager</span>
+    }
+</h1>
 
 <hr />
 

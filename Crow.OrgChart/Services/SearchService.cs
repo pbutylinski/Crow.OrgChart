@@ -43,7 +43,8 @@ namespace Crow.OrgChart.Services
                     Id = x.Id.Value,
                     LevelId = x.LevelId,
                     Role = x.Role,
-                    Name = x.Name
+                    Name = x.Name,
+                    IsManager = x.IsManager
                 });
 
             return users.ToList();

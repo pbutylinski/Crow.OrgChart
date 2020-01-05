@@ -21,5 +21,8 @@ namespace Crow.OrgChart.DataStorage
         public int Hierarchy { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        [DisplayName("Department manager")]
+        public bool IsManager { get; set; }
     }
 }

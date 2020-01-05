@@ -10,5 +10,6 @@ namespace Crow.OrgChart.Models
         public string Name { get; set; }
         public string Role { get; set; }
         public int Hierarchy { get; set; }
+        public bool IsManager { get; set; }
     }
 }

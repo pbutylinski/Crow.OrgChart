@@ -42,7 +42,8 @@ namespace Crow.OrgChart.Services
                 Hierarchy = x.Hierarchy,
                 Name = x.Name,
                 Role = x.Role,
-                LevelId = x.LevelId
+                LevelId = x.LevelId,
+                IsManager = x.IsManager
             });
 
             var model = new OrganizationLevelViewModel
@@ -50,7 +51,7 @@ namespace Crow.OrgChart.Services
                 Id = id,
                 LevelName = level.Name,
                 ChildLevels = childLevels,
-                Members = members.OrderBy(x => x.Hierarchy).ThenBy(x => x.Name),
+                Members = members.OrderBy(x => x.IsManager).ThenBy(x => x.Hierarchy).ThenBy(x => x.Name),
                 ParentLevels = LevelHelper.GetParentLevels(organization, level)
             };
 
@@ -101,7 +102,8 @@ namespace Crow.OrgChart.Services
                                         Hierarchy = m.Hierarchy,
                                         Name = m.Name,
                                         Role = m.Role,
-                                        LevelId = m.LevelId
+                                        LevelId = m.LevelId,
+                                        IsManager = m.IsManager
                                     })
                             });
         }

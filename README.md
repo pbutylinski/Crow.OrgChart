@@ -3,8 +3,8 @@ This is a project that was made in order to help us organize our convention staf
 
 Functions (so far):
  - create infinitely nested levels of an organization
- - assign members with their respective roles to the organization (along with hierarchy, contact info and notes)
- - visualize the departments hierarchy on graph
+ - assign members with their respective roles to each department (along with hierarchy, contact info and notes)
+ - visualize the organization's departments hierarchy on a graph
  - search by member or department name
  
 The project is open source, so feel free to fork it and adapt to your needs (just please don't forget to credit me as the original author).

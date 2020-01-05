@@ -12,26 +12,23 @@ namespace Crow.OrgChart.DataStorage
     {
         private const string JsonFileName = "data.json";
 
+        private static Organization OrganizationCache;
+
         public Organization GetOrganization()
         {
-            if (File.Exists(JsonFileName))
+            if (OrganizationCache == null)
             {
-                var fileContents = File.ReadAllText(JsonFileName, Encoding.UTF8);
-                var organization = JsonConvert.DeserializeObject<Organization>(fileContents);
-
-                this.FilterSoftDeleteFlag(organization);
-
-                return organization;
+                this.LoadFile();
             }
 
-            return new Organization();
+            return OrganizationCache ?? new Organization();
         }
 
         public void SetOrganizationName(string name)
         {
             var organization = this.GetOrganization();
             organization.Name = name;
-            this.Save(organization);
+            this.SaveFile(organization);
         }
 
         public OrganizationLevel GetLevel(Guid id)
@@ -62,7 +59,7 @@ namespace Crow.OrgChart.DataStorage
             var organization = this.GetOrganization();
             level.Id = Guid.NewGuid();
             organization.OrganizationLevels.Add(level);
-            this.Save(organization);
+            this.SaveFile(organization);
         }
 
         public void DeleteLevel(Guid levelId)
@@ -71,7 +68,7 @@ namespace Crow.OrgChart.DataStorage
             var level = organization.OrganizationLevels.Single(x => x.Id == levelId);
             level.IsDeleted = true;
 
-            this.Save(organization);
+            this.SaveFile(organization);
 
             foreach (var item in organization.OrganizationLevels.Where(x => x.ParentId == levelId))
             {
@@ -103,7 +100,7 @@ namespace Crow.OrgChart.DataStorage
             member.Id = Guid.NewGuid();
             level.Members.Add(member);
 
-            this.Save(organization);
+            this.SaveFile(organization);
         }
 
         public void DeleteMember(Guid levelId, Guid memberId)
@@ -114,7 +111,7 @@ namespace Crow.OrgChart.DataStorage
 
             member.IsDeleted = true;
 
-            this.Save(organization);
+            this.SaveFile(organization);
         }
 
         public void UpdateLevel(OrganizationLevel level)
@@ -125,7 +122,7 @@ namespace Crow.OrgChart.DataStorage
 
             oldLevel.Name = level.Name;
 
-            this.Save(organization);
+            this.SaveFile(organization);
         }
 
         public void UpdateMember(MemberDetails member)
@@ -143,13 +140,28 @@ namespace Crow.OrgChart.DataStorage
             oldMember.Notes = member.Notes;
             oldMember.Role = member.Role;
 
-            this.Save(organization);
+            this.SaveFile(organization);
         }
 
-        private void Save(Organization organization)
+        private void LoadFile()
+        {
+            if (File.Exists(JsonFileName))
+            {
+                var fileContents = File.ReadAllText(JsonFileName, Encoding.UTF8);
+                var organization = JsonConvert.DeserializeObject<Organization>(fileContents);
+
+                this.FilterSoftDeleteFlag(organization);
+
+                OrganizationCache = organization;
+            }
+        }
+
+        private void SaveFile(Organization organization)
         {
             var fileContents = JsonConvert.SerializeObject(organization);
             File.WriteAllText(JsonFileName, fileContents);
+
+            OrganizationCache = organization;
         }
 
         private void FilterSoftDeleteFlag(Organization organization)

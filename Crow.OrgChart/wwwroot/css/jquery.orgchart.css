@@ -93,7 +93,7 @@ div.orgChart {
     bottom: 3px;
     left: 5px;
     padding-left: 13px;
-    background: url(../Images/add.png) no-repeat 0 3px;
+    background: url(../img/add.png) no-repeat 0 3px;
 }
 
     .org-add-button:hover,
@@ -104,7 +104,7 @@ div.orgChart {
     }
 
 .org-del-button {
-    background: url(../Images/delete.png) no-repeat;
+    background: url(../img/delete.png) no-repeat;
     width: 12px;
     height: 12px;
     bottom: 7px;

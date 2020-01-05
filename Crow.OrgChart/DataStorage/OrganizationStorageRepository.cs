@@ -139,6 +139,7 @@ namespace Crow.OrgChart.DataStorage
             oldMember.Name = member.Name;
             oldMember.Notes = member.Notes;
             oldMember.Role = member.Role;
+            oldMember.IsManager = member.IsManager;
 
             this.SaveFile(organization);
         }

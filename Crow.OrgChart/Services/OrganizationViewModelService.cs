@@ -51,7 +51,7 @@ namespace Crow.OrgChart.Services
                 Id = id,
                 LevelName = level.Name,
                 ChildLevels = childLevels,
-                Members = members.OrderBy(x => x.IsManager).ThenBy(x => x.Hierarchy).ThenBy(x => x.Name),
+                Members = members.OrderByDescending(x => x.IsManager).ThenBy(x => x.Hierarchy).ThenBy(x => x.Name),
                 ParentLevels = LevelHelper.GetParentLevels(organization, level)
             };
 

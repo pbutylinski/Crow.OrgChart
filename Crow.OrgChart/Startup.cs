@@ -1,3 +1,4 @@
+using AutoMapper;
 using Crow.OrgChart.DataStorage;
 using Crow.OrgChart.Services;
 using Microsoft.AspNetCore.Builder;
@@ -19,11 +20,12 @@ namespace Crow.OrgChart
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-
             services.AddTransient<IOrganizationStorageRepository, OrganizationStorageRepository>();
             services.AddTransient<IOrganizationViewModelService, OrganizationViewModelService>();
             services.AddTransient<ISearchService, SearchService>();
+
+            services.AddControllersWithViews();
+            services.AddAutoMapper(typeof(Startup));
 
             services.AddMvcCore(options =>
             {

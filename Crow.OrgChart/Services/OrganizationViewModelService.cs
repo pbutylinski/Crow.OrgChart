@@ -1,4 +1,5 @@
-﻿using Crow.OrgChart.DataStorage;
+﻿using AutoMapper;
+using Crow.OrgChart.DataStorage;
 using Crow.OrgChart.Helpers;
 using Crow.OrgChart.Models;
 using System;
@@ -10,10 +11,14 @@ namespace Crow.OrgChart.Services
     public class OrganizationViewModelService : IOrganizationViewModelService
     {
         private readonly IOrganizationStorageRepository repo;
+        private readonly IMapper mapper;
 
-        public OrganizationViewModelService(IOrganizationStorageRepository repo)
+        public OrganizationViewModelService(
+            IOrganizationStorageRepository repo,
+            IMapper mapper)
         {
             this.repo = repo;
+            this.mapper = mapper;
         }
 
         public OrganizationLevelViewModel GetOrganizationViewModel()
@@ -32,26 +37,21 @@ namespace Crow.OrgChart.Services
 
         public OrganizationLevelViewModel GetLevelViewModel(Guid id)
         {
-            // TODO: Use AutoMapper
             var level = this.repo.GetLevel(id);
             var organization = this.repo.GetOrganization();
             var childLevels = this.GetChildLevelModels(id);
-            var members = level.Members.Select(x => new MemberListItemViewModel
-            {
-                Id = x.Id.Value,
-                Hierarchy = x.Hierarchy,
-                Name = x.Name,
-                Role = x.Role,
-                LevelId = x.LevelId,
-                IsManager = x.IsManager
-            });
+            var members = level.Members
+                .Select(this.mapper.Map<MemberListItemViewModel>)
+                .OrderByDescending(x => x.IsManager)
+                .ThenBy(x => x.Hierarchy)
+                .ThenBy(x => x.Name);
 
             var model = new OrganizationLevelViewModel
             {
                 Id = id,
                 LevelName = level.Name,
                 ChildLevels = childLevels,
-                Members = members.OrderByDescending(x => x.IsManager).ThenBy(x => x.Hierarchy).ThenBy(x => x.Name),
+                Members = members,
                 ParentLevels = LevelHelper.GetParentLevels(organization, level)
             };
 
@@ -61,12 +61,9 @@ namespace Crow.OrgChart.Services
         public List<OrganizationChartItemViewModel> GetChartViewModelItems()
         {
             var organization = this.repo.GetOrganization();
-            var items = organization.OrganizationLevels.Select(x => new OrganizationChartItemViewModel
-            {
-                Id = x.Id.ToString(),
-                Parent = (x.ParentId ?? Guid.Empty).ToString(),
-                Name = x.Name
-            }).ToList();
+            var items = organization.OrganizationLevels
+                .Select(this.mapper.Map<OrganizationChartItemViewModel>)
+                .ToList();
 
             items.Add(new OrganizationChartItemViewModel
             {
@@ -89,22 +86,12 @@ namespace Crow.OrgChart.Services
                                 ChildLevels = this.repo
                                     .GetChildLevels(x.Id)
                                     .OrderBy(x => x.Name)
-                                    .Select(c => new OrganizationLevelViewModel
-                                    {
-                                        Id = c.Id.Value,
-                                        LevelName = c.Name
-                                    }),
+                                    .Select(this.mapper.Map<OrganizationLevelViewModel>),
                                 Members = x.Members
-                                    .OrderBy(x => x.Hierarchy)
-                                    .Select(m => new MemberListItemViewModel
-                                    {
-                                        Id = m.Id.Value,
-                                        Hierarchy = m.Hierarchy,
-                                        Name = m.Name,
-                                        Role = m.Role,
-                                        LevelId = m.LevelId,
-                                        IsManager = m.IsManager
-                                    })
+                                    .OrderBy(x => x.IsManager)
+                                    .ThenBy(x => x.Hierarchy)
+                                    .ThenBy(x => x.Name)
+                                    .Select(this.mapper.Map<MemberListItemViewModel>)
                             });
         }
     }

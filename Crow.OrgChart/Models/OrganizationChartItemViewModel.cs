@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Crow.OrgChart.Models
 {
@@ -12,5 +13,14 @@ namespace Crow.OrgChart.Models
 
         [JsonPropertyName("name")]
         public string Name { get; set; }
+
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
+
+        [JsonPropertyName("managers")]
+        public ICollection<string> Managers { get; set; } = new List<string>();
+
+        [JsonPropertyName("members")]
+        public ICollection<string> Members { get; set; } = new List<string>();
     }
 }

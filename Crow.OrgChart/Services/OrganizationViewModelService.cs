@@ -1,24 +1,28 @@
-﻿using AutoMapper;
-using Crow.OrgChart.DataStorage;
-using Crow.OrgChart.Helpers;
-using Crow.OrgChart.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Crow.OrgChart.Services
+﻿namespace Crow.OrgChart.Services
 {
+    using AutoMapper;
+    using DataStorage;
+    using Helpers;
+    using Microsoft.Extensions.Configuration;
+    using Models;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class OrganizationViewModelService : IOrganizationViewModelService
     {
         private readonly IOrganizationStorageRepository repo;
         private readonly IMapper mapper;
+        private readonly string RootUrl;
 
         public OrganizationViewModelService(
             IOrganizationStorageRepository repo,
-            IMapper mapper)
+            IMapper mapper,
+            IConfiguration configuration)
         {
             this.repo = repo;
             this.mapper = mapper;
+            this.RootUrl = configuration.GetValue<string>("RootUrl");
         }
 
         public OrganizationLevelViewModel GetOrganizationViewModel()
@@ -65,11 +69,17 @@ namespace Crow.OrgChart.Services
                 .Select(this.mapper.Map<OrganizationChartItemViewModel>)
                 .ToList();
 
+            foreach (var item in items)
+            {
+                item.Url = $"{RootUrl}/Organization/Level/{item.Id}";
+            }
+
             items.Add(new OrganizationChartItemViewModel
             {
                 Id = Guid.Empty.ToString(),
                 Parent = string.Empty,
-                Name = organization.Name
+                Name = organization.Name,
+                Url = RootUrl + "/Organization"
             });
 
             return items;

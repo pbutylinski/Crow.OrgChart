@@ -1,0 +1,60 @@
+.chart ul, .chart ol, .chart li, .chart p {
+    margin: 0;
+    padding: 0;
+}
+
+.node-name {
+    font-size: 125%;
+    padding: 5px 20px;
+    margin: 0;
+    font-weight: 800;
+}
+
+.node-title {
+    font-style: italic;
+}
+
+.node-contacts {
+    font-style: oblique;
+    font-weight: bold;
+}
+
+.nodeTemplate {
+    color: black;
+    padding: 2px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #fff6f0;
+    border: 1px solid #000;
+    width: 150px;
+    font-size: 12px;
+    text-align: center;
+}
+
+    .nodeTemplate:link {
+        text-decoration: none;
+    }
+
+    .nodeTemplate:visited {
+        text-decoration: none;
+    }
+
+.node-menager {
+    font-weight: bold;
+    text-align: left;
+}
+
+.node-member {
+    text-align: left;
+}
+
+.node-list {
+    list-style-type: none;
+    padding: 5px;
+    margin-bottom: 0;
+}
+
+.node hr {
+    margin: 0;
+}
